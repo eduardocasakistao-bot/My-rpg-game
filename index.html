@@ -1,0 +1,190 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101522">
+<title>RPG Status</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101522;color:#fff;font-family:Arial,sans-serif;padding:20px}
+header{text-align:center;margin:15px 0 25px}
+h1{color:#a78bfa;margin-bottom:5px}
+.sub{color:#9ca3af}
+button,input{font:inherit}
+button{border:0;border-radius:9px;padding:11px 14px;background:#7055d9;color:white;font-weight:bold;cursor:pointer}
+input{width:100%;padding:12px;margin:7px 0 14px;background:#202a3b;color:white;border:1px solid #46516a;border-radius:8px}
+.panel,.character{background:#1b2536;border:1px solid #354158;border-radius:13px;padding:16px;margin-bottom:15px}
+label{color:#cbd5e1;font-size:14px}
+.create{width:100%;background:#7055d9}
+.character h2{margin:0 0 5px}
+.classname{color:#a78bfa;margin-bottom:18px}
+.stat{margin:17px 0}
+.stathead{display:flex;justify-content:space-between;margin-bottom:7px;font-size:14px}
+.bar{height:13px;background:#303b50;border-radius:20px;overflow:hidden}
+.fill{height:100%;border-radius:20px;transition:width .2s}
+.hp{background:#22c55e}
+.mp{background:#3b82f6}
+.xp{background:#a855f7}
+.controls{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+.controls button{flex:1;min-width:55px}
+.secondary{background:#39465d}
+.danger{background:#b93848}
+.edit{background:#536a91}
+.empty{text-align:center;color:#9ca3af;padding:25px 5px}
+#form{display:none}
+footer{text-align:center;color:#64748b;font-size:12px;margin-top:25px}
+</style>
+</head>
+<body>
+<header>
+<h1>⚔ RPG STATUS</h1>
+<div class="sub">Seu personagem. Suas regras.</div>
+</header>
+
+<div class="panel">
+<h3>➕ Criar personagem</h3>
+<form id="form">
+<label>Nome do personagem</label>
+<input id="name" placeholder="Digite o nome" required maxlength="35">
+<label>Nome da classe</label>
+<input id="className" placeholder="Crie sua própria classe" required maxlength="30">
+<label>Vida máxima</label>
+<input id="maxHp" type="number" min="1" value="100" required>
+<label>Mana máxima</label>
+<input id="maxMp" type="number" min="1" value="100" required>
+<button type="submit" class="create">Criar personagem</button>
+</form>
+<button id="showForm" class="create" onclick="toggleForm()">+ Novo personagem</button>
+</div>
+
+<h3>👥 Personagens</h3>
+<div id="characters"></div>
+
+<footer>RPG STATUS • Seus dados ficam salvos neste aparelho.</footer>
+
+<script>
+let characters=JSON.parse(localStorage.getItem("rpgCharacters")||"[]");
+
+function save(){
+ localStorage.setItem("rpgCharacters",JSON.stringify(characters));
+ render();
+}
+
+function toggleForm(){
+ const f=document.getElementById("form");
+ f.style.display=f.style.display==="block"?"none":"block";
+ document.getElementById("showForm").style.display=f.style.display==="block"?"none":"block";
+}
+
+document.getElementById("form").addEventListener("submit",function(e){
+ e.preventDefault();
+ const hp=Math.max(1,Number(document.getElementById("maxHp").value));
+ const mp=Math.max(1,Number(document.getElementById("maxMp").value));
+ characters.push({
+ id:Date.now(),
+ name:document.getElementById("name").value,
+ className:document.getElementById("className").value,
+ hp:hp,maxHp:hp,
+ mp:mp,maxMp:mp,
+ xp:0,maxXp:100
+ });
+ this.reset();
+ document.getElementById("maxHp").value=100;
+ document.getElementById("maxMp").value=100;
+ toggleForm();
+ save();
+});
+
+function change(id,stat,amount){
+ const c=characters.find(x=>x.id===id);
+ if(!c)return;
+ if(stat==="hp")c.hp=Math.max(0,Math.min(c.maxHp,c.hp+amount));
+ if(stat==="mp")c.mp=Math.max(0,Math.min(c.maxMp,c.mp+amount));
+ if(stat==="xp"){
+  c.xp=Math.max(0,c.xp+amount);
+  while(c.xp>=c.maxXp){
+   c.xp-=c.maxXp;
+   c.maxXp+=50;
+  }
+ }
+ save();
+}
+
+function editCharacter(id){
+ const c=characters.find(x=>x.id===id);
+ if(!c)return;
+ const n=prompt("Novo nome:",c.name);
+ if(n===null)return;
+ const cl=prompt("Novo nome de classe:",c.className);
+ if(cl===null)return;
+ if(n.trim())c.name=n.trim();
+ if(cl.trim())c.className=cl.trim();
+ save();
+}
+
+function removeCharacter(id){
+ if(!confirm("Excluir este personagem?"))return;
+ characters=characters.filter(c=>c.id!==id);
+ save();
+}
+
+function resetCharacter(id){
+ const c=characters.find(x=>x.id===id);
+ if(!c)return;
+ if(!confirm("Reiniciar os atributos deste personagem?"))return;
+ c.hp=c.maxHp;
+ c.mp=c.maxMp;
+ c.xp=0;
+ c.maxXp=100;
+ save();
+}
+
+function bar(title,value,max,color,id,stat){
+ const percent=Math.max(0,Math.min(100,value/max*100));
+ return `
+ <div class="stat">
+  <div class="stathead"><span>${title}</span><span>${value} / ${max}</span></div>
+  <div class="bar"><div class="fill ${color}" style="width:${percent}%"></div></div>
+  <div class="controls">
+   <button class="secondary" onclick="change(${id},'${stat}',-10)">-10</button>
+   <button class="secondary" onclick="change(${id},'${stat}',-1)">-1</button>
+   <button onclick="change(${id},'${stat}',1)">+1</button>
+   <button onclick="change(${id},'${stat}',10)">+10</button>
+  </div>
+ </div>`;
+}
+
+function render(){
+ const container=document.getElementById("characters");
+ if(!characters.length){
+  container.innerHTML='<div class="panel empty">Nenhum personagem criado.<br>Crie seu primeiro personagem acima!</div>';
+  return;
+ }
+ container.innerHTML=characters.map(c=>`
+ <div class="character">
+  <h2>${escapeHTML(c.name)}</h2>
+  <div class="classname">${escapeHTML(c.className)}</div>
+  ${bar("❤️ Vida",c.hp,c.maxHp,"hp",c.id,"hp")}
+  ${bar("💧 Mana",c.mp,c.maxMp,"mp",c.id,"mp")}
+  ${bar("⭐ Experiência",c.xp,c.maxXp,"xp",c.id,"xp")}
+  <div class="controls">
+   <button class="edit" onclick="editCharacter(${c.id})">✏ Editar</button>
+   <button class="secondary" onclick="resetCharacter(${c.id})">↻ Reiniciar</button>
+   <button class="danger" onclick="removeCharacter(${c.id})">Excluir</button>
+  </div>
+ </div>
+ `).join("");
+}
+
+function escapeHTML(str){
+ return String(str).replace(/[&<>"']/g,s=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ })[s]);
+}
+
+render();
+</script>
+</body>
+</html>
