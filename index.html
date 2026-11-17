@@ -105,12 +105,17 @@ function change(id,stat,amount){
  if(stat==="mp")c.mp=Math.max(0,Math.min(c.maxMp,c.mp+amount));
  if(stat==="xp"){
   c.xp=Math.max(0,c.xp+amount);
-  while(c.xp>=c.maxXp){
-   c.xp-=c.maxXp;
-   c.maxXp+=50;
-  }
+  while(c.xp>=100 && c.level<100){
+    c.xp-=100;
+    c.level++;
+}
+
+if(c.level>=100){
+    c.level=100;
+    c.xp=0;
+}
  }
- save();
+save();
 }
 
 function editCharacter(id){
