@@ -168,9 +168,9 @@ function render(){
   container.innerHTML='<div class="panel empty">Nenhum personagem criado.<br>Crie seu primeiro personagem acima!</div>';
   return;
  }
- container.innerHTML=characters.map(c=>`
- <div class="character">
-  <h2>${escapeHTML(c.name)}</h2>
+  container.innerHTML=characters.map(c=>`
+<div class="character">
+<h2>Nv. ${c.level} | ${escapeHTML(c.name)}</h2>                                    
   <div class="classname">${escapeHTML(c.className)}</div>
   ${bar("❤️ Vida",c.hp,c.maxHp,"hp",c.id,"hp")}
   ${bar("💧 Mana",c.mp,c.maxMp,"mp",c.id,"mp")}
