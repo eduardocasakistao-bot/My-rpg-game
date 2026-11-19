@@ -86,7 +86,7 @@ label{color:#cbd5e1;font-size:13px}
  color:#fbbf24;font-size:13px;text-align:center;margin-bottom:10px
 }
 .inventory{
- display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px
 }
 .slot{
  min-width:0;background:#26354b;border:1px solid #46516a;
@@ -94,6 +94,24 @@ label{color:#cbd5e1;font-size:13px}
 }
 .slot-number{font-size:11px;color:#a78bfa}
 .slot input{
+ padding:7px 3px;margin:5px 0 0;
+ font-size:11px;text-align:center
+}
+.slot-actions{
+ display:flex;gap:8px;margin-top:10px
+}
+.slot-actions button{flex:1;font-size:12px}
+.armor-grid{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px
+}
+.armor-slot{
+ min-width:0;background:#26354b;border:1px solid #9275dc;
+ border-radius:8px;padding:8px;text-align:center
+}
+.armor-slot .slot-number{
+ color:#c4b5fd;font-weight:bold
+}
+.armor-slot input{
  padding:7px 3px;margin:5px 0 0;
  font-size:11px;text-align:center
 }
@@ -211,16 +229,30 @@ footer{text-align:center;color:#64748b;font-size:12px;margin-top:25px}
 <script>
 let characters=JSON.parse(localStorage.getItem("rpgCharacters")||"[]");
 
-// Adiciona os novos campos aos personagens antigos.
+// Atualização dos personagens antigos sem apagar seus dados.
 characters.forEach(c=>{
  if(!c.attributes)c.attributes={
   forca:0,defesa:0,agilidade:0,
   inteligencia:0,carisma:0,vitalidade:0
  };
+
  if(c.attributePoints===undefined)c.attributePoints=0;
- if(!c.inventory)c.inventory=["","","","",""];
+
+ if(!Array.isArray(c.inventory))c.inventory=["","",""];
+
+ // Mantém itens antigos e remove apenas espaços vazios excedentes.
+ while(c.inventory.length>3 &&
+       c.inventory[c.inventory.length-1]===""){
+  c.inventory.pop();
+ }
+
  if(!c.coins)c.coins={bronze:0,prata:0,ouro:0};
  if(c.maxXp===undefined)c.maxXp=100;
+
+ // Quatro espaços fixos de armadura.
+ if(!Array.isArray(c.armor))c.armor=["","","",""];
+ while(c.armor.length<4)c.armor.push("");
+ c.armor=c.armor.slice(0,4);
 });
 
 function save(){
@@ -253,7 +285,8 @@ document.getElementById("form").addEventListener("submit",function(e){
    forca:0,defesa:0,agilidade:0,
    inteligencia:0,carisma:0,vitalidade:0
   },
-  inventory:["","","","",""],
+  inventory:["","",""],
+  armor:["","","",""],
   coins:{bronze:0,prata:0,ouro:0}
  });
 
@@ -311,10 +344,54 @@ function changeAttribute(id,attribute,amount){
  save();
 }
 
+// INVENTÁRIO: começa com 3 e permite adicionar até 10 extras.
+function addInventorySlot(id){
+ const c=characters.find(x=>x.id===id);
+ if(!c)return;
+
+ if(c.inventory.length>=13){
+  alert("Limite máximo de 13 espaços atingido!");
+  return;
+ }
+
+ c.inventory.push("");
+ save();
+}
+
+function removeInventorySlot(id){
+ const c=characters.find(x=>x.id===id);
+ if(!c)return;
+
+ if(c.inventory.length<=3){
+  alert("Os 3 espaços iniciais não podem ser removidos!");
+  return;
+ }
+
+ const last=c.inventory.length-1;
+
+ if(c.inventory[last]){
+  alert("Esvazie o último espaço antes de removê-lo!");
+  return;
+ }
+
+ c.inventory.pop();
+ save();
+}
+
 function updateInventory(id,index,value){
  const c=characters.find(x=>x.id===id);
  if(!c)return;
+
  c.inventory[index]=value.slice(0,35);
+ localStorage.setItem("rpgCharacters",JSON.stringify(characters));
+}
+
+// ARMADURA: quatro espaços fixos.
+function updateArmor(id,index,value){
+ const c=characters.find(x=>x.id===id);
+ if(!c)return;
+
+ c.armor[index]=value.slice(0,35);
  localStorage.setItem("rpgCharacters",JSON.stringify(characters));
 }
 
@@ -455,6 +532,7 @@ function render(){
    <div>
     <div class="section">
      <h3>🎒 INVENTÁRIO</h3>
+
      <div class="inventory">
       ${c.inventory.map((item,i)=>`
        <div class="slot">
@@ -464,6 +542,36 @@ function render(){
          placeholder="Vazio"
          maxlength="35"
          onchange="updateInventory(${c.id},${i},this.value)">
+       </div>
+      `).join("")}
+     </div>
+
+     <div class="slot-actions">
+      <button onclick="addInventorySlot(${c.id})"
+       ${c.inventory.length>=13?'disabled style="opacity:.5"':''}>
+       + Adicionar slot (${c.inventory.length}/13)
+      </button>
+
+      <button class="danger" onclick="removeInventorySlot(${c.id})"
+       ${c.inventory.length<=3?'disabled style="opacity:.5"':''}>
+       − Remover
+      </button>
+     </div>
+    </div>
+
+    <div class="section">
+     <h3>🛡️ ARMADURA</h3>
+     <div class="armor-grid">
+      ${c.armor.map((item,i)=>`
+       <div class="armor-slot">
+        <div class="slot-number">
+         ${["CABEÇA","PEITO","PERNAS","PÉS"][i]}
+        </div>
+        <input
+         value="${escapeHTML(item)}"
+         placeholder="Vazio"
+         maxlength="35"
+         onchange="updateArmor(${c.id},${i},this.value)">
        </div>
       `).join("")}
      </div>
@@ -560,8 +668,8 @@ function updateClock(){
   (isDay?"Dia":"Noite")+" • "+
   (clock.running?"Relógio em andamento":"Relógio parado");
 
- // Ponteiro percorre a metade superior no dia e a inferior na noite.
- const progress=isDay?position/DAY_LENGTH: (position-DAY_LENGTH)/NIGHT_LENGTH;
+ const progress=isDay?position/DAY_LENGTH:
+  (position-DAY_LENGTH)/NIGHT_LENGTH;
  const angle=isDay?(-90+progress*180):(90+progress*180);
 
  document.getElementById("clockHand").style.transform=
