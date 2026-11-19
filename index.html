@@ -6,66 +6,222 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#101522">
 <title>RPG Status</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#101522;color:#fff;font-family:Arial,sans-serif;padding:20px}
-header{text-align:center;margin:15px 0 25px}
+body{
+ margin:0;padding:16px;background:#101522;color:#fff;
+ font-family:Arial,sans-serif
+}
+header{text-align:center;margin:12px 0 22px}
 h1{color:#a78bfa;margin-bottom:5px}
 .sub{color:#9ca3af}
 button,input{font:inherit}
-button{border:0;border-radius:9px;padding:11px 14px;background:#7055d9;color:white;font-weight:bold;cursor:pointer}
-input{width:100%;padding:12px;margin:7px 0 14px;background:#202a3b;color:white;border:1px solid #46516a;border-radius:8px}
-.panel,.character{background:#1b2536;border:1px solid #354158;border-radius:13px;padding:16px;margin-bottom:15px}
-label{color:#cbd5e1;font-size:14px}
-.create{width:100%;background:#7055d9}
-.character h2{margin:0 0 5px}
-.classname{color:#a78bfa;margin-bottom:18px}
-.stat{margin:17px 0}
-.stathead{display:flex;justify-content:space-between;margin-bottom:7px;font-size:14px}
+button{
+ border:0;border-radius:8px;padding:9px 12px;
+ background:#7055d9;color:white;font-weight:bold;cursor:pointer
+}
+input{
+ width:100%;padding:10px;margin:5px 0 12px;
+ background:#202a3b;color:white;border:1px solid #46516a;
+ border-radius:8px
+}
+label{color:#cbd5e1;font-size:13px}
+.panel,.character{
+ background:#1b2536;border:1px solid #354158;
+ border-radius:13px;padding:15px;margin-bottom:15px
+}
+.create{width:100%}
+#form{display:none;margin-top:15px}
+.character{
+ border:1px solid #7661b5;
+ background:linear-gradient(145deg,#202b40,#151d2c)
+}
+.sheet-header{
+ text-align:center;padding:12px 5px;
+ border-bottom:1px solid #56617a;margin-bottom:14px
+}
+.sheet-header h2{margin:0;color:#e4d9ff;font-size:23px}
+.sheet-class{color:#a78bfa;margin-top:6px}
+.level-box{
+ display:inline-block;background:#392d62;
+ border:1px solid #9275dc;border-radius:20px;
+ padding:5px 13px;margin-top:10px;font-weight:bold
+}
+.section{
+ border:1px solid #46516a;border-radius:10px;
+ padding:12px;margin:12px 0;background:#172132
+}
+.section h3{
+ color:#c4b5fd;font-size:15px;margin:0 0 12px;
+ border-bottom:1px solid #354158;padding-bottom:8px
+}
+.stat{margin:14px 0}
+.stathead{
+ display:flex;justify-content:space-between;
+ margin-bottom:7px;font-size:14px
+}
 .bar{height:13px;background:#303b50;border-radius:20px;overflow:hidden}
 .fill{height:100%;border-radius:20px;transition:width .2s}
 .hp{background:#22c55e}
 .mp{background:#3b82f6}
 .xp{background:#a855f7}
-.controls{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
-.controls button{flex:1;min-width:55px}
+.controls{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.controls button{flex:1;min-width:48px}
 .secondary{background:#39465d}
 .danger{background:#b93848}
 .edit{background:#536a91}
+.attribute{
+ display:flex;justify-content:space-between;align-items:center;
+ padding:8px 0;border-bottom:1px solid #303b50;gap:8px
+}
+.attribute:last-child{border:0}
+.attribute-name{font-size:14px;font-weight:bold}
+.attribute-controls{display:flex;align-items:center;gap:8px}
+.attribute-controls button{padding:5px 11px}
+.attribute-value{
+ min-width:25px;text-align:center;font-size:17px;font-weight:bold
+}
+.points{
+ color:#fbbf24;font-size:13px;text-align:center;margin-bottom:10px
+}
+.inventory{
+ display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px
+}
+.slot{
+ min-width:0;background:#26354b;border:1px solid #46516a;
+ border-radius:8px;padding:6px;text-align:center
+}
+.slot-number{font-size:11px;color:#a78bfa}
+.slot input{
+ padding:7px 3px;margin:5px 0 0;
+ font-size:11px;text-align:center
+}
+.coins{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.coin-box{
+ background:#26354b;border-radius:9px;padding:10px 4px;
+ text-align:center
+}
+.coin{
+ width:36px;height:36px;border-radius:50%;
+ display:flex;flex-direction:column;justify-content:center;
+ align-items:center;gap:2px;margin:0 auto 7px;
+ border:2px solid #ffffff80
+}
+.coin i{
+ display:block;width:15px;height:2px;
+ background:#59452e;border-radius:4px
+}
+.bronze{background:#b87333}
+.silver{background:#c0c7d1}
+.gold{background:#eabf42}
+.coin-box strong{font-size:13px}
+.coin-box input{text-align:center;padding:7px 2px;margin:7px 0 0}
+.clock{text-align:center}
+.clock-face{
+ width:145px;height:145px;border-radius:50%;
+ border:5px solid #a78bfa;margin:12px auto;
+ position:relative;overflow:hidden;
+ background:linear-gradient(to bottom,#eabf62 50%,#34466d 50%)
+}
+.clock-face:after{
+ content:"";position:absolute;top:50%;left:0;
+ width:100%;border-top:2px solid #fff9
+}
+.clock-label{
+ position:absolute;width:100%;text-align:center;
+ font-weight:bold;font-size:12px;z-index:1
+}
+.day-label{top:23px;color:#49340d}
+.night-label{bottom:23px;color:white}
+.clock-hand{
+ position:absolute;left:calc(50% - 2px);top:50%;
+ width:4px;height:54px;background:#fff;
+ transform-origin:50% 0%;z-index:2;
+ border-radius:5px
+}
+.clock-center{
+ position:absolute;top:calc(50% - 6px);left:calc(50% - 6px);
+ width:12px;height:12px;background:white;
+ border-radius:50%;z-index:3
+}
+.clock-time{font-size:25px;font-weight:bold;color:#e4d9ff}
+.clock-status{color:#cbd5e1;font-size:13px;margin:5px}
+.clock-buttons{display:flex;justify-content:center;gap:8px}
 .empty{text-align:center;color:#9ca3af;padding:25px 5px}
-#form{display:none}
 footer{text-align:center;color:#64748b;font-size:12px;margin-top:25px}
+@media(min-width:650px){
+ body{max-width:850px;margin:auto;padding:24px}
+ .character{padding:20px}
+ .sheet-columns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+}
 </style>
 </head>
+
 <body>
 <header>
-<h1>⚔ RPG STATUS</h1>
-<div class="sub">Seu personagem. Suas regras.</div>
+ <h1>⚔ RPG STATUS</h1>
+ <div class="sub">Seu personagem. Suas regras.</div>
 </header>
 
 <div class="panel">
-<h3>➕ Criar personagem</h3>
-<form id="form">
-<label>Nome do personagem</label>
-<input id="name" placeholder="Digite o nome" required maxlength="35">
-<label>Nome da classe</label>
-<input id="className" placeholder="Crie sua própria classe" required maxlength="30">
-<label>Vida máxima</label>
-<input id="maxHp" type="number" min="1" value="100" required>
-<label>Mana máxima</label>
-<input id="maxMp" type="number" min="1" value="100" required>
-<button type="submit" class="create">Criar personagem</button>
-</form>
-<button id="showForm" class="create" onclick="toggleForm()">+ Novo personagem</button>
+ <h3>➕ Criar personagem</h3>
+ <button id="showForm" class="create" onclick="toggleForm()">+ Novo personagem</button>
+
+ <form id="form">
+  <label>Nome do personagem</label>
+  <input id="name" placeholder="Digite o nome" required maxlength="35">
+
+  <label>Nome da classe</label>
+  <input id="className" placeholder="Crie sua própria classe" required maxlength="30">
+
+  <label>Vida máxima</label>
+  <input id="maxHp" type="number" min="1" value="100" required>
+
+  <label>Mana máxima</label>
+  <input id="maxMp" type="number" min="1" value="100" required>
+
+  <button type="submit" class="create">Criar personagem</button>
+ </form>
 </div>
 
-<h3>👥 Personagens</h3>
+<h3>📜 Fichas de personagens</h3>
 <div id="characters"></div>
+
+<div class="panel clock">
+ <h3>🕒 Relógio do mundo</h3>
+ <div class="clock-face">
+  <span class="clock-label day-label">DIA</span>
+  <span class="clock-label night-label">NOITE</span>
+  <div class="clock-hand" id="clockHand"></div>
+  <div class="clock-center"></div>
+ </div>
+ <div class="clock-time" id="clockTime">15:00</div>
+ <div class="clock-status" id="clockStatus">Dia • Relógio parado</div>
+ <div class="clock-buttons">
+  <button onclick="startClock()">▶ Iniciar</button>
+  <button class="secondary" onclick="pauseClock()">Ⅱ Pausar</button>
+  <button class="danger" onclick="resetClock()">↻ Reiniciar</button>
+ </div>
+ <p class="sub">15 minutos de dia + 15 minutos de noite.</p>
+</div>
 
 <footer>RPG STATUS • Seus dados ficam salvos neste aparelho.</footer>
 
 <script>
 let characters=JSON.parse(localStorage.getItem("rpgCharacters")||"[]");
+
+// Adiciona os novos campos aos personagens antigos.
+characters.forEach(c=>{
+ if(!c.attributes)c.attributes={
+  forca:0,defesa:0,agilidade:0,
+  inteligencia:0,carisma:0,vitalidade:0
+ };
+ if(c.attributePoints===undefined)c.attributePoints=0;
+ if(!c.inventory)c.inventory=["","","","",""];
+ if(!c.coins)c.coins={bronze:0,prata:0,ouro:0};
+ if(c.maxXp===undefined)c.maxXp=100;
+});
 
 function save(){
  localStorage.setItem("rpgCharacters",JSON.stringify(characters));
@@ -75,22 +231,32 @@ function save(){
 function toggleForm(){
  const f=document.getElementById("form");
  f.style.display=f.style.display==="block"?"none":"block";
- document.getElementById("showForm").style.display=f.style.display==="block"?"none":"block";
+ document.getElementById("showForm").style.display=
+  f.style.display==="block"?"none":"block";
 }
 
 document.getElementById("form").addEventListener("submit",function(e){
  e.preventDefault();
+
  const hp=Math.max(1,Number(document.getElementById("maxHp").value));
  const mp=Math.max(1,Number(document.getElementById("maxMp").value));
+
  characters.push({
- id:Date.now(),
- name:document.getElementById("name").value,
- className:document.getElementById("className").value,
- hp:hp,maxHp:hp,
- mp:mp,maxMp:mp,
- level:1,
-xp:0,maxXp:100
+  id:Date.now(),
+  name:document.getElementById("name").value,
+  className:document.getElementById("className").value,
+  hp:hp,maxHp:hp,
+  mp:mp,maxMp:mp,
+  level:1,xp:0,maxXp:100,
+  attributePoints:0,
+  attributes:{
+   forca:0,defesa:0,agilidade:0,
+   inteligencia:0,carisma:0,vitalidade:0
+  },
+  inventory:["","","","",""],
+  coins:{bronze:0,prata:0,ouro:0}
  });
+
  this.reset();
  document.getElementById("maxHp").value=100;
  document.getElementById("maxMp").value=100;
@@ -101,32 +267,84 @@ xp:0,maxXp:100
 function change(id,stat,amount){
  const c=characters.find(x=>x.id===id);
  if(!c)return;
- if(stat==="hp")c.hp=Math.max(0,Math.min(c.maxHp,c.hp+amount));
- if(stat==="mp")c.mp=Math.max(0,Math.min(c.maxMp,c.mp+amount));
+
+ if(stat==="hp"){
+  c.hp=Math.max(0,Math.min(c.maxHp,c.hp+amount));
+ }
+
+ if(stat==="mp"){
+  c.mp=Math.max(0,Math.min(c.maxMp,c.mp+amount));
+ }
+
  if(stat==="xp"){
   c.xp=Math.max(0,c.xp+amount);
+
   while(c.xp>=100 && c.level<100){
-    c.xp-=100;
-    c.level++;
+   c.xp-=100;
+   c.level++;
+   c.attributePoints++;
+  }
+
+  if(c.level>=100){
+   c.level=100;
+   c.xp=0;
+  }
+ }
+
+ save();
 }
 
-if(c.level>=100){
-    c.level=100;
-    c.xp=0;
-}
+function changeAttribute(id,attribute,amount){
+ const c=characters.find(x=>x.id===id);
+ if(!c)return;
+
+ if(amount>0){
+  if(c.attributePoints<=0)return;
+  c.attributes[attribute]++;
+  c.attributePoints--;
+ }else{
+  if(c.attributes[attribute]<=0)return;
+  c.attributes[attribute]--;
+  c.attributePoints++;
  }
-save();
+
+ save();
+}
+
+function updateInventory(id,index,value){
+ const c=characters.find(x=>x.id===id);
+ if(!c)return;
+ c.inventory[index]=value.slice(0,35);
+ localStorage.setItem("rpgCharacters",JSON.stringify(characters));
+}
+
+function changeCoin(id,type,amount){
+ const c=characters.find(x=>x.id===id);
+ if(!c)return;
+ c.coins[type]=Math.max(0,Number(c.coins[type]||0)+amount);
+ save();
+}
+
+function setCoin(id,type,value){
+ const c=characters.find(x=>x.id===id);
+ if(!c)return;
+ c.coins[type]=Math.max(0,Number(value)||0);
+ localStorage.setItem("rpgCharacters",JSON.stringify(characters));
 }
 
 function editCharacter(id){
  const c=characters.find(x=>x.id===id);
  if(!c)return;
+
  const n=prompt("Novo nome:",c.name);
  if(n===null)return;
+
  const cl=prompt("Novo nome de classe:",c.className);
  if(cl===null)return;
+
  if(n.trim())c.name=n.trim();
  if(cl.trim())c.className=cl.trim();
+
  save();
 }
 
@@ -139,20 +357,27 @@ function removeCharacter(id){
 function resetCharacter(id){
  const c=characters.find(x=>x.id===id);
  if(!c)return;
- if(!confirm("Reiniciar os atributos deste personagem?"))return;
+ if(!confirm("Reiniciar vida, mana e XP deste personagem?"))return;
+
  c.hp=c.maxHp;
  c.mp=c.maxMp;
  c.xp=0;
- c.maxXp=100;
+
  save();
 }
 
 function bar(title,value,max,color,id,stat){
  const percent=Math.max(0,Math.min(100,value/max*100));
+
  return `
  <div class="stat">
-  <div class="stathead"><span>${title}</span><span>${value} / ${max}</span></div>
-  <div class="bar"><div class="fill ${color}" style="width:${percent}%"></div></div>
+  <div class="stathead">
+   <span>${title}</span>
+   <span>${value} / ${max}</span>
+  </div>
+  <div class="bar">
+   <div class="fill ${color}" style="width:${percent}%"></div>
+  </div>
   <div class="controls">
    <button class="secondary" onclick="change(${id},'${stat}',-10)">-10</button>
    <button class="secondary" onclick="change(${id},'${stat}',-1)">-1</button>
@@ -162,35 +387,192 @@ function bar(title,value,max,color,id,stat){
  </div>`;
 }
 
+function attributeHTML(c,name,key){
+ return `
+ <div class="attribute">
+  <span class="attribute-name">${name}</span>
+  <div class="attribute-controls">
+   <button class="secondary" onclick="changeAttribute(${c.id},'${key}',-1)">−</button>
+   <span class="attribute-value">${c.attributes[key]||0}</span>
+   <button onclick="changeAttribute(${c.id},'${key}',1)">+</button>
+  </div>
+ </div>`;
+}
+
+function coinHTML(c,type,name,coinClass,stripes){
+ return `
+ <div class="coin-box">
+  <div class="coin ${coinClass}">
+   ${Array.from({length:stripes},()=>"<i></i>").join("")}
+  </div>
+  <strong>${name}</strong>
+  <input type="number" min="0" value="${Number(c.coins[type]||0)}"
+   onchange="setCoin(${c.id},'${type}',this.value)">
+  <div class="controls">
+   <button class="secondary" onclick="changeCoin(${c.id},'${type}',-1)">−</button>
+   <button onclick="changeCoin(${c.id},'${type}',1)">+</button>
+  </div>
+ </div>`;
+}
+
 function render(){
  const container=document.getElementById("characters");
+
  if(!characters.length){
-  container.innerHTML='<div class="panel empty">Nenhum personagem criado.<br>Crie seu primeiro personagem acima!</div>';
+  container.innerHTML=
+   '<div class="panel empty">Nenhum personagem criado.<br>Crie seu primeiro personagem acima!</div>';
   return;
  }
-  container.innerHTML=characters.map(c=>`
-<div class="character">
-<h2>Nv. ${c.level} | ${escapeHTML(c.name)}</h2>                                    
-  <div class="classname">${escapeHTML(c.className)}</div>
-  ${bar("❤️ Vida",c.hp,c.maxHp,"hp",c.id,"hp")}
-  ${bar("💧 Mana",c.mp,c.maxMp,"mp",c.id,"mp")}
-  ${bar("⭐ Experiência",c.xp,c.maxXp,"xp",c.id,"xp")}
+
+ container.innerHTML=characters.map(c=>`
+ <div class="character">
+
+  <div class="sheet-header">
+   <h2>${escapeHTML(c.name)}</h2>
+   <div class="sheet-class">${escapeHTML(c.className)}</div>
+   <div class="level-box">NÍVEL ${c.level} / 100</div>
+  </div>
+
+  <div class="section">
+   <h3>❤️ STATUS DO PERSONAGEM</h3>
+   ${bar("❤️ Vida",c.hp,c.maxHp,"hp",c.id,"hp")}
+   ${bar("💧 Mana",c.mp,c.maxMp,"mp",c.id,"mp")}
+   ${bar("⭐ Experiência",c.xp,100,"xp",c.id,"xp")}
+  </div>
+
+  <div class="sheet-columns">
+   <div class="section">
+    <h3>⚔ ATRIBUTOS</h3>
+    <div class="points">Pontos disponíveis: ${c.attributePoints}</div>
+    ${attributeHTML(c,"Força","forca")}
+    ${attributeHTML(c,"Defesa","defesa")}
+    ${attributeHTML(c,"Agilidade","agilidade")}
+    ${attributeHTML(c,"Inteligência","inteligencia")}
+    ${attributeHTML(c,"Carisma","carisma")}
+    ${attributeHTML(c,"Vitalidade","vitalidade")}
+   </div>
+
+   <div>
+    <div class="section">
+     <h3>🎒 INVENTÁRIO</h3>
+     <div class="inventory">
+      ${c.inventory.map((item,i)=>`
+       <div class="slot">
+        <div class="slot-number">ESPAÇO ${i+1}</div>
+        <input
+         value="${escapeHTML(item)}"
+         placeholder="Vazio"
+         maxlength="35"
+         onchange="updateInventory(${c.id},${i},this.value)">
+       </div>
+      `).join("")}
+     </div>
+    </div>
+
+    <div class="section">
+     <h3>🪙 CARTEIRA</h3>
+     <div class="coins">
+      ${coinHTML(c,"bronze","Bronze","bronze",2)}
+      ${coinHTML(c,"prata","Prata","silver",3)}
+      ${coinHTML(c,"ouro","Ouro","gold",4)}
+     </div>
+    </div>
+   </div>
+  </div>
+
   <div class="controls">
    <button class="edit" onclick="editCharacter(${c.id})">✏ Editar</button>
-   <button class="secondary" onclick="resetCharacter(${c.id})">↻ Reiniciar</button>
+   <button class="secondary" onclick="resetCharacter(${c.id})">↻ Reiniciar status</button>
    <button class="danger" onclick="removeCharacter(${c.id})">Excluir</button>
   </div>
+
  </div>
  `).join("");
 }
 
 function escapeHTML(str){
  return String(str).replace(/[&<>"']/g,s=>({
- "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
  })[s]);
 }
 
+// RELÓGIO GLOBAL DO MUNDO
+const DAY_LENGTH=15*60*1000;
+const NIGHT_LENGTH=15*60*1000;
+const CYCLE_LENGTH=DAY_LENGTH+NIGHT_LENGTH;
+
+let clock=JSON.parse(localStorage.getItem("rpgClock")||"null")||{
+ running:false,
+ elapsed:0,
+ startAt:null
+};
+
+function saveClock(){
+ localStorage.setItem("rpgClock",JSON.stringify(clock));
+}
+
+function getElapsed(){
+ if(clock.running && clock.startAt!==null){
+  return clock.elapsed+(Date.now()-clock.startAt);
+ }
+ return clock.elapsed;
+}
+
+function startClock(){
+ if(clock.running)return;
+ clock.startAt=Date.now();
+ clock.running=true;
+ saveClock();
+ updateClock();
+}
+
+function pauseClock(){
+ if(!clock.running)return;
+ clock.elapsed=getElapsed();
+ clock.running=false;
+ clock.startAt=null;
+ saveClock();
+ updateClock();
+}
+
+function resetClock(){
+ clock.running=false;
+ clock.elapsed=0;
+ clock.startAt=null;
+ saveClock();
+ updateClock();
+}
+
+function updateClock(){
+ const elapsed=getElapsed();
+ const position=elapsed%CYCLE_LENGTH;
+ const isDay=position<DAY_LENGTH;
+ const remaining=isDay?DAY_LENGTH-position:CYCLE_LENGTH-position;
+
+ const minutes=Math.floor(remaining/60000);
+ const seconds=Math.floor((remaining%60000)/1000);
+
+ document.getElementById("clockTime").textContent=
+  String(minutes).padStart(2,"0")+":"+
+  String(seconds).padStart(2,"0");
+
+ document.getElementById("clockStatus").textContent=
+  (isDay?"Dia":"Noite")+" • "+
+  (clock.running?"Relógio em andamento":"Relógio parado");
+
+ // Ponteiro percorre a metade superior no dia e a inferior na noite.
+ const progress=isDay?position/DAY_LENGTH: (position-DAY_LENGTH)/NIGHT_LENGTH;
+ const angle=isDay?(-90+progress*180):(90+progress*180);
+
+ document.getElementById("clockHand").style.transform=
+  "rotate("+angle+"deg)";
+
+ saveClock();
+}
+
 render();
+updateClock();
+setInterval(updateClock,1000);
 </script>
 </body>
 </html>
